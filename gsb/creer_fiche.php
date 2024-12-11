@@ -48,8 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="description">Description :</label>
         <textarea name="description" id="description" required></textarea>
         <br>
-        <button type="submit">Enregistrer</button>
+        <button class="enre" type="submit">Enregistrer</button>
     </form>
-    <a href="index.php">Retour à l'accueil</a>
+    <a href="visiteur.php">Retour à l'accueil</a>
+    <style>
+        .enre{
+    background-color: #3384da;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+        }
+        .enre:hover{
+            background-color: #3384da;
+        }
+    </style>
 </body>
 </html>
