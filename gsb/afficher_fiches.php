@@ -33,6 +33,7 @@ $stmt->execute([$_SESSION['utilisateur']]);
             <th>Date</th>
             <th>Montant</th>
             <th>Description</th>
+            <th>status</th>
         </tr>
         <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) : ?>
             <tr>
