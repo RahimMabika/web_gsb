@@ -1,17 +1,47 @@
 <?php
 session_start();
-echo "Bienvenue Comptable";
 $dsn = 'mysql:host=localhost;dbname=gsb;charset=utf8mb4';
 $user = 'root';
 $password = '';
 
 try {
     $pdo = new PDO($dsn, $user, $password);
-    echo "Connexion réussie !";
 } catch (PDOException $e) {
     die('Erreur de connexion : ' . $e->getMessage());}
-?>
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['fiche_id']) && isset($_POST['action'])) {
+    $fiche_id = $_POST['fiche_id'];
+    $action = $_POST['action'];
+
+    switch ($action) {
+        case 'valider':
+            $new_status = 'validée';
+            break;
+        case 'refuser':
+            $new_status = 'refusée';
+            break;
+        case 'en_attente':
+            $new_status = 'en attente';
+            break;
+        default:
+            $new_status = 'en attente';
+            break;
+    }
+
+    $sql = "UPDATE fiches SET status = :status WHERE id = :fiche_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':status' => $new_status,
+        ':fiche_id' => $fiche_id
+    ]);
+
+    header('Location: comptable.php');
+    exit();
+}
+
+$sql = "SELECT * FROM fiches";
+$stmt = $pdo->query($sql);
+$fiches = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -19,11 +49,15 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Interface Comptable</title>
+    <title>Validation fiches de frais</title>
 </head>
 <body>
     <header>
-        <h1>Interface Comptable - Validation des Fiches de Frais</h1>
+        <h1>Validation des Fiches de Frais</h1>
+        <nav>
+            <a href="index.php">Accueil</a>
+            <a href="login.php">Déconnexion</a>
+        </nav>
     </header>
     <div class="container">
         <?php if (!empty($fiches)): ?>
@@ -47,8 +81,9 @@ try {
                             <td>
                                 <form method="POST" style="display: flex; gap: 5px;">
                                     <input type="hidden" name="fiche_id" value="<?= $fiche['id'] ?>">
-                                    <button type="submit" name="action" value="valider" class="btn green">Valider</button>
-                                    <button type="submit" name="action" value="refuser" class="btn red">Refuser</button>
+                                    <button type="submit" name="action" value="valider" class="btnc">Valider</button>
+                                    <button type="submit" name="action" value="refuser" class="btnc">Refuser</button>
+                                    <button  type="submit" name="action" value="refuser" class="btnc">En attente</button>
                                 </form>
                             </td>
                         </tr>
@@ -59,5 +94,23 @@ try {
             <p>Aucune fiche de frais en attente de validation.</p>
         <?php endif; ?>
     </div>
+    <style>
+        .container{
+            justify-content: center;
+            align-items: center;
+
+        }
+        .btnc {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btnc:hover{
+            background-color: #007BFF;
+        }
+    </style>
 </body>
 </html>
